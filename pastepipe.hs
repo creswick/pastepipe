@@ -26,6 +26,7 @@ import Network.Browser
 import Data.Maybe
 import System.Environment (getEnv)
 import System.Console.CmdArgs
+import Control.Monad (when)
 
 main :: IO () 
 main = do
@@ -34,7 +35,7 @@ main = do
   content <- getContents
   let postFn = if test conf then fakePost else post
   resultUrl <- postFn conf content
-  putStrLn $ show resultUrl
+  print resultUrl
   
 -- | Configuration type for PastePipe:
 data Config = Config { userName :: String
@@ -73,7 +74,7 @@ config realUser = Config { userName = realUser
 outHandler :: String -> IO ()
 outHandler str = do
   loud <- isLoud -- are we running in verbose mode?
-  if loud then (putStr str) else (const (return()) str)
+  when loud $ putStr str
 
 -- | The "root" uri for hpaste.org
 defaultUri :: String 
