@@ -30,7 +30,7 @@ import System.Console.CmdArgs
 main :: IO () 
 main = do
   realUser <- getEnv "USER"
-  conf <- cmdArgs "PastePipe v1.3, (C) Rogan Creswick 2009" [config realUser]
+  conf <- cmdArgs $ config realUser
   content <- getContents
   let postFn = if test conf then fakePost else post
   resultUrl <- postFn conf content
@@ -44,27 +44,29 @@ data Config = Config { userName :: String
                      , test :: Bool }
               deriving (Show, Data, Typeable)
 
--- | Default config.
--- The string passed in is the current user's username.
-config :: String -> Mode Config
-config realUser = mode $ Config { 
-                    userName = realUser &= text 
-                      "Your user name"
-                      & typ "USER"
-                      & explicit & flag "user" & flag "u"
-                  , language = "haskell" &= text 
-                      "The language used for syntax highlighting"
-                      & typ "LANGUAGE"
-                  , title = "" &= text 
-                      "The title of the snippet"
-                      & typ "TITLE"
-                      & explicit & flag "title" & flag "t"
-                  , uri = defaultUri &= text 
-                      "The URI of the hpaste instance to post to"
-                      & typ "URL"
-                  , test = False &= text 
-                      "Prevents PastePipe from actually posting content, just echos the configuration and input"
-                  }
+config :: String -> Config
+config realUser = Config { userName = realUser
+                                &= help "Your user name"
+                                &= typ "USER"
+                                &= explicit
+                                &= name "user" 
+                         , language = "haskell"
+                                &= help "The language used for syntax highlighting"
+                                &= typ "LANGUAGE"
+                         , title = ""
+                                &= help "The title of the snippet"
+                                &= typ "TITLE"
+                                &= explicit
+                                &= name "title"
+                                &= name "t"
+                         , uri = defaultUri
+                                &= help "The URI of the hpaste instance to post to"
+                                &= typ "URL"
+                         , test = False
+                                &= help "Prevents PastePipe from actually posting content, just echos the configuration and input"
+                         }
+                         &= summary "PastePipe v1.3, (C) Rogan Creswick 2009"
+                         &= program "pastepipe"
 
 
 -- | Define an output handler based on the user-specified verbosity.
@@ -75,12 +77,12 @@ outHandler str = do
 
 -- | The "root" uri for hpaste.org
 defaultUri :: String 
-defaultUri = "http://hpaste.org/fastcgi/hpaste.fcgi/"
+defaultUri = "http://hpaste.org/"
 
 -- | The URI for posting new pastes to hpaste.
 -- This isn't guaranteed to trigger a failure on all execution paths, as-is.
 saveUri :: String -> URI
-saveUri coreUri = buildURI coreUri "save"
+saveUri coreUri = buildURI coreUri "new"
 
 -- | composes the core uri and a string to create a usable URI
 buildURI :: String -> String -> URI
@@ -100,9 +102,11 @@ buildRequest :: Config -> String -> Request String
 buildRequest conf str = formToRequest $ Form POST (saveUri $ uri conf)
                              [ ("title", title conf)
                              , ("author", userName conf)
-                             , ("content", str)
+                             , ("paste", str)
                              , ("language", language conf)
-                             , ("channel", "")]
+                             , ("channel", "")
+                             , ("email", "")
+                             ]
 
 fakePost ::  Config -> String -> IO URI
 fakePost conf str = do 
