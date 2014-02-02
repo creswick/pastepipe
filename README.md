@@ -19,7 +19,7 @@ pastepipe [FLAG]
      --test               Prevents PastePipe from actually posting content, just echos the configuration and input
 ```
 
-It will auto-detect your local username, but -u overrides this detection.
+It will auto-detect your local username, but --user overrides this detection.
 
 Parameters can come in any order, but only the first of duplicate entries will be used. So, if you have an alias to send to a local hpaste uri, then that alias should effectively disable the --uri switch. It is not possible to "disable" the --test or --help switches in this way, so you can always add --test to a command line to disable the actual sending of content.
 
