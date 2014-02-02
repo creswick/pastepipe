@@ -40,7 +40,7 @@ config realUser = Config { userName = realUser
                                 &= name "title"
                                 &= name "t"
                          , uri = defaultUri
-                                &= help "The URI of the hpaste instance to post to"
+                                &= help "The URI of the lpaste instance to post to"
                                 &= typ "URL"
                          , test = False
                                 &= help "Prevents PastePipe from actually posting content, just echos the configuration and input"
@@ -63,7 +63,7 @@ outHandler str = do
 defaultUri :: String
 defaultUri = "http://lpaste.net/"
 
--- | The URI for posting new pastes to hpaste.
+-- | The URI for posting new pastes to lpaste.
 -- This isn't guaranteed to trigger a failure on all execution paths, as-is.
 saveUri :: String -> URI
 saveUri coreUri = buildURI coreUri "new"
@@ -72,7 +72,7 @@ saveUri coreUri = buildURI coreUri "new"
 buildURI :: String -> String -> URI
 buildURI coreUri str = fromJust $ parseURI $ coreUri ++ str
 
--- | Posts the given content to hpaste.org, returning the new uri.
+-- | Posts the given content to lpaste.net, returning the new uri.
 post :: Config -> String -> IO URI
 post conf str = do
   (url, _) <- Network.Browser.browse $ do

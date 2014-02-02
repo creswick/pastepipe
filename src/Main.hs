@@ -10,19 +10,19 @@
 --
 --  Authored by Rogan Creswick (creswick_at_googles_mail_service.)
 --
--- Pastepipe reads from stdin, posting to hpaste, and prints out the
+-- Pastepipe reads from stdin, posting to lpaste, and prints out the
 -- resulting url (the last line of output).  Parameters control various
--- hpaste form fields:
+-- lpaste form fields:
 --
 --   --user         (defaults to $USER)
 --   -l --language  (defaults to haskell, of course)
 --   -t --title     (defaults to the empty string)
 --   -u --uri       (defaults to <http://lpaste.net>)
 --
--- It will auto-detect your local username, but -u overrides this detection.
+-- It will auto-detect your local username, but --user overrides this detection.
 --
--- compile with:
--- ghci --make -package HTTP pastepipe.hs -o pastepipe
+-- Use @cabal install@ to install this. The executable will be called
+-- @pastepipe@.
 module Main where
 
 import System.Console.CmdArgs

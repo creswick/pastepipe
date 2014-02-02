@@ -1,4 +1,4 @@
-# A CLI for Hpaste.org.
+# A CLI for lpaste.net.
 
 Pastepipe reads from stdin, posting to hpaste, and prints out the resulting url (the last line of output). Parameters control various hpaste form fields:
 
@@ -12,10 +12,10 @@ pastepipe [FLAG]
   -V --version            Show version information
   -v --verbose            Higher verbosity
   -q --quiet              Lower verbosity
-  -u --user=USER          Your user name (default=rogue)
+  --user=USER             Your user name (default is taken from $USER)
   -l --language=LANGUAGE  The language used for syntax highlighting (default=haskell)
   -t --title=TITLE        The title of the snippet
-     --uri=URL            The URI of the hpaste instance to post to (default=http://hpaste.org/fastcgi/hpaste.fcgi/)
+  -u --uri=URL            The URI of the lpaste instance to post to (default=http://lpaste.net/)
      --test               Prevents PastePipe from actually posting content, just echos the configuration and input
 ```
 
@@ -31,3 +31,4 @@ PastePipe is available on hackage (http://hackage.haskell.org/package/PastePipe)
 
  - Rogan Creswick
  - Brian Victor
+ - Mateusz Kowalczyk
