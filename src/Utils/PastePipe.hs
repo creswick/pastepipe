@@ -1,41 +1,19 @@
 {-# LANGUAGE DeriveDataTypeable #-}
--- pastepipe.hs
+-- |
+-- Module      :  Utils.PastePipe
+-- Copyright   :  (c) Ragon Creswick, 2009-2012
+--                    Mateusz Kowalczyk, 2014
+-- License     :  GPL-3
 --
--- A CLI for Hpaste.org.
---
---  Authored by Rogan Creswick (creswick_at_googles_mail_service.)
---
--- Pastepipe reads from stdin, posting to hpaste, and prints out the
--- resulting url (the last line of output).  Parameters control various
--- hpaste form fields:
---
---   -u username  (defaults to $USER)
---   -l language  (defaults to haskell, of course)
---   -t title     (defaults to the empty string)
---
--- It will auto-detect your local username, but -u overrides this detection.
---
--- compile with:
--- ghci --make -package HTTP pastepipe.hs -o pastepipe
-
-module Main where
+-- Configuration and communication with lpaste.net
+module Utils.PastePipe where
 
 import Network.HTTP.Base
 import Network.URI
 import Network.Browser
 import Data.Maybe
-import System.Environment (getEnv)
 import System.Console.CmdArgs
 import Control.Monad (when)
-
-main :: IO ()
-main = do
-  realUser <- getEnv "USER"
-  conf <- cmdArgs $ config realUser
-  content <- getContents
-  let postFn = if test conf then fakePost else post
-  resultUrl <- postFn conf content
-  print resultUrl
 
 -- | Configuration type for PastePipe:
 data Config = Config { userName :: String
