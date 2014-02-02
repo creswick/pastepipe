@@ -1,42 +1,21 @@
 {-# LANGUAGE DeriveDataTypeable #-}
--- pastepipe.hs
--- 
--- A CLI for Hpaste.org.
+-- |
+-- Module      :  Utils.PastePipe
+-- Copyright   :  (c) Ragon Creswick, 2009-2012
+--                    Mateusz Kowalczyk, 2014
+-- License     :  GPL-3
 --
---  Authored by Rogan Creswick (creswick_at_googles_mail_service.)
---
--- Pastepipe reads from stdin, posting to hpaste, and prints out the 
--- resulting url (the last line of output).  Parameters control various 
--- hpaste form fields:
---
---   -u username  (defaults to $USER)
---   -l language  (defaults to haskell, of course)
---   -t title     (defaults to the empty string)
---
--- It will auto-detect your local username, but -u overrides this detection.
--- 
--- compile with: 
--- ghci --make -package HTTP pastepipe.hs -o pastepipe
+-- Configuration and communication with lpaste.net
+module Utils.PastePipe where
 
-module Main where
-
+import Control.Monad (when)
+import Data.Maybe
+import Network.Browser
 import Network.HTTP.Base
 import Network.URI
-import Network.Browser
-import Data.Maybe
-import System.Environment (getEnv)
 import System.Console.CmdArgs
-import Control.Monad (when)
+import System.Environment (getEnv)
 
-main :: IO () 
-main = do
-  realUser <- getEnv "USER"
-  conf <- cmdArgs $ config realUser
-  content <- getContents
-  let postFn = if test conf then fakePost else post
-  resultUrl <- postFn conf content
-  print resultUrl
-  
 -- | Configuration type for PastePipe:
 data Config = Config { userName :: String
                      , language :: String
@@ -50,7 +29,7 @@ config realUser = Config { userName = realUser
                                 &= help "Your user name"
                                 &= typ "USER"
                                 &= explicit
-                                &= name "user" 
+                                &= name "user"
                          , language = "haskell"
                                 &= help "The language used for syntax highlighting"
                                 &= typ "LANGUAGE"
@@ -61,7 +40,7 @@ config realUser = Config { userName = realUser
                                 &= name "title"
                                 &= name "t"
                          , uri = defaultUri
-                                &= help "The URI of the hpaste instance to post to"
+                                &= help "The URI of the lpaste instance to post to"
                                 &= typ "URL"
                          , test = False
                                 &= help "Prevents PastePipe from actually posting content, just echos the configuration and input"
@@ -69,6 +48,10 @@ config realUser = Config { userName = realUser
                          &= summary "PastePipe v1.3, (C) Rogan Creswick 2009"
                          &= program "pastepipe"
 
+-- | Takes a string to post to the default and returns the URI.
+-- Client code is expected to catch any exceptions.
+postWithDefaults :: String -> IO URI
+postWithDefaults s = getEnv "USER" >>= \u -> post (config u) s
 
 -- | Define an output handler based on the user-specified verbosity.
 outHandler :: String -> IO ()
@@ -76,11 +59,11 @@ outHandler str = do
   loud <- isLoud -- are we running in verbose mode?
   when loud $ putStr str
 
--- | The "root" uri for hpaste.org
-defaultUri :: String 
-defaultUri = "http://hpaste.org/"
+-- | The "root" uri for lpaste.net
+defaultUri :: String
+defaultUri = "http://lpaste.net/"
 
--- | The URI for posting new pastes to hpaste.
+-- | The URI for posting new pastes to lpaste.
 -- This isn't guaranteed to trigger a failure on all execution paths, as-is.
 saveUri :: String -> URI
 saveUri coreUri = buildURI coreUri "new"
@@ -89,9 +72,9 @@ saveUri coreUri = buildURI coreUri "new"
 buildURI :: String -> String -> URI
 buildURI coreUri str = fromJust $ parseURI $ coreUri ++ str
 
--- | Posts the given content to hpaste.org, returning the new uri.
+-- | Posts the given content to lpaste.net, returning the new uri.
 post :: Config -> String -> IO URI
-post conf str = do 
+post conf str = do
   (url, _) <- Network.Browser.browse $ do
                   setOutHandler outHandler
                   setAllowRedirects True -- handle HTTP redirects
@@ -110,7 +93,7 @@ buildRequest conf str = formToRequest $ Form POST (saveUri $ uri conf)
                              ]
 
 fakePost ::  Config -> String -> IO URI
-fakePost conf str = do 
+fakePost conf str = do
   putStrLn $ "uri: "++uri conf
   putStrLn $ "user: "++userName conf
   putStrLn $ "lang: "++language conf
