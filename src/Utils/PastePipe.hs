@@ -8,12 +8,13 @@
 -- Configuration and communication with lpaste.net
 module Utils.PastePipe where
 
+import Control.Monad (when)
+import Data.Maybe
+import Network.Browser
 import Network.HTTP.Base
 import Network.URI
-import Network.Browser
-import Data.Maybe
 import System.Console.CmdArgs
-import Control.Monad (when)
+import System.Environment (getEnv)
 
 -- | Configuration type for PastePipe:
 data Config = Config { userName :: String
@@ -47,6 +48,10 @@ config realUser = Config { userName = realUser
                          &= summary "PastePipe v1.3, (C) Rogan Creswick 2009"
                          &= program "pastepipe"
 
+-- | Takes a string to post to the default and returns the URI.
+-- Client code is expected to catch any exceptions.
+postWithDefaults :: String -> IO URI
+postWithDefaults s = getEnv "USER" >>= \u -> post (config u) s
 
 -- | Define an output handler based on the user-specified verbosity.
 outHandler :: String -> IO ()
@@ -54,9 +59,9 @@ outHandler str = do
   loud <- isLoud -- are we running in verbose mode?
   when loud $ putStr str
 
--- | The "root" uri for hpaste.org
+-- | The "root" uri for lpaste.net
 defaultUri :: String
-defaultUri = "http://hpaste.org/"
+defaultUri = "http://lpaste.net/"
 
 -- | The URI for posting new pastes to hpaste.
 -- This isn't guaranteed to trigger a failure on all execution paths, as-is.
