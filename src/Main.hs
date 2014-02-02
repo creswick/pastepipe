@@ -14,9 +14,10 @@
 -- resulting url (the last line of output).  Parameters control various
 -- hpaste form fields:
 --
---   -u username  (defaults to $USER)
---   -l language  (defaults to haskell, of course)
---   -t title     (defaults to the empty string)
+--   --user         (defaults to $USER)
+--   -l --language  (defaults to haskell, of course)
+--   -t --title     (defaults to the empty string)
+--   -u --uri       (defaults to <http://lpaste.net>)
 --
 -- It will auto-detect your local username, but -u overrides this detection.
 --
