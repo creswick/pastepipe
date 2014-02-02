@@ -1,12 +1,12 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 -- pastepipe.hs
--- 
+--
 -- A CLI for Hpaste.org.
 --
 --  Authored by Rogan Creswick (creswick_at_googles_mail_service.)
 --
--- Pastepipe reads from stdin, posting to hpaste, and prints out the 
--- resulting url (the last line of output).  Parameters control various 
+-- Pastepipe reads from stdin, posting to hpaste, and prints out the
+-- resulting url (the last line of output).  Parameters control various
 -- hpaste form fields:
 --
 --   -u username  (defaults to $USER)
@@ -14,8 +14,8 @@
 --   -t title     (defaults to the empty string)
 --
 -- It will auto-detect your local username, but -u overrides this detection.
--- 
--- compile with: 
+--
+-- compile with:
 -- ghci --make -package HTTP pastepipe.hs -o pastepipe
 
 module Main where
@@ -28,7 +28,7 @@ import System.Environment (getEnv)
 import System.Console.CmdArgs
 import Control.Monad (when)
 
-main :: IO () 
+main :: IO ()
 main = do
   realUser <- getEnv "USER"
   conf <- cmdArgs $ config realUser
@@ -36,7 +36,7 @@ main = do
   let postFn = if test conf then fakePost else post
   resultUrl <- postFn conf content
   print resultUrl
-  
+
 -- | Configuration type for PastePipe:
 data Config = Config { userName :: String
                      , language :: String
@@ -50,7 +50,7 @@ config realUser = Config { userName = realUser
                                 &= help "Your user name"
                                 &= typ "USER"
                                 &= explicit
-                                &= name "user" 
+                                &= name "user"
                          , language = "haskell"
                                 &= help "The language used for syntax highlighting"
                                 &= typ "LANGUAGE"
@@ -77,7 +77,7 @@ outHandler str = do
   when loud $ putStr str
 
 -- | The "root" uri for hpaste.org
-defaultUri :: String 
+defaultUri :: String
 defaultUri = "http://hpaste.org/"
 
 -- | The URI for posting new pastes to hpaste.
@@ -91,7 +91,7 @@ buildURI coreUri str = fromJust $ parseURI $ coreUri ++ str
 
 -- | Posts the given content to hpaste.org, returning the new uri.
 post :: Config -> String -> IO URI
-post conf str = do 
+post conf str = do
   (url, _) <- Network.Browser.browse $ do
                   setOutHandler outHandler
                   setAllowRedirects True -- handle HTTP redirects
@@ -110,7 +110,7 @@ buildRequest conf str = formToRequest $ Form POST (saveUri $ uri conf)
                              ]
 
 fakePost ::  Config -> String -> IO URI
-fakePost conf str = do 
+fakePost conf str = do
   putStrLn $ "uri: "++uri conf
   putStrLn $ "user: "++userName conf
   putStrLn $ "lang: "++language conf
