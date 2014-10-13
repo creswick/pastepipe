@@ -1,4 +1,4 @@
-''Deprecation warning:''' I am no longer actively maintaining pastepipe because I don't have time to keep it from bitrotting.  If anyone would like to take it over, please let me know. I'm also happy to apply pull requests that address issues/add documented features.
+**Deprecation warning:** I am no longer actively maintaining pastepipe because I don't have time to keep it from bitrotting.  If anyone would like to take it over, please let me know. I'm also happy to apply pull requests that address issues/add documented features.
 
 # A CLI for lpaste.net.
 
